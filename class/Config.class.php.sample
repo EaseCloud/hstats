@@ -1,0 +1,28 @@
+<?php
+
+class Config
+{
+
+    const DB_HOST = '127.0.0.1';
+    const DB_NAME = 'hstats';
+    const DB_USER = 'root';
+    const DB_PASS = 'root';
+
+    const ALLOWED_ORIGIN = array(
+        'http://www.easecloud.cn',
+    );
+
+    static $pdo;
+
+    static function pdo($db = Config::DB_NAME)
+    {
+        if (!static::$pdo) {
+            $conn = "mysql:host=" . Config::DB_HOST;
+            if ($db) $conn .= ";dbname=$db";
+            static::$pdo = new PDO($conn, Config::DB_USER, Config::DB_PASS);
+        }
+
+        return static::$pdo;
+    }
+
+}
