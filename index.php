@@ -10,7 +10,7 @@ require_once 'bootstrap.inc.php';
 $origin = @$_SERVER['HTTP_ORIGIN'] ?: http_die('请求无效：无效的域名');
 
 // TODO: WILDCARD ORIGINAL TO BE SUPPORTED
-if (in_array($origin, Config::ALLOWED_ORIGIN)) {
+if (in_array($origin, Config::$allowed_origin)) {
     // Only allow the config valid origin.
     header("Access-Control-Allow-Origin: $origin");
 }
@@ -77,7 +77,7 @@ function increase_count($url)
 
     // 动态清库函数，清理区间之外的记录，
     if(rand(0, 10000) == 0) {
-        $time_exipired = time() - Config::EXPIRE_TIME;
+        $time_exipired = time() - Config::$expire_time;
         $result = $pdo->exec("
             delete from hstats_ip_status
             where last_time < $time_exipired;
