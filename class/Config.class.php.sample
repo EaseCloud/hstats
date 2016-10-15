@@ -12,6 +12,8 @@ class Config
         'http://www.easecloud.cn',
     );
 
+    const EXPIRE_TIME = 24 * 60 *60;
+
     static $pdo;
 
     static function pdo($db = Config::DB_NAME)
