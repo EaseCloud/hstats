@@ -74,6 +74,16 @@ function increase_count($url)
             ON DUPLICATE KEY UPDATE cnt = cnt + 1;
         ");
     if (!$result) http_die(implode("\t", $pdo->errorInfo()));
+
+    // 动态清库函数，清理区间之外的记录，
+    if(rand(0, 10000) == 0) {
+        $time_exipired = time() - Config::EXPIRE_TIME;
+        $result = $pdo->exec("
+            delete from hstats_ip_status
+            where last_time < $time_exipired;
+        ");
+        if (!$result) http_die(implode("\t", $pdo->errorInfo()));
+    }
 }
 
 exit(strval(get_visit_count($ip, $from_url)));
