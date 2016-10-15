@@ -3,25 +3,26 @@
 class Config
 {
 
-    const DB_HOST = '127.0.0.1';
-    const DB_NAME = 'hstats';
-    const DB_USER = 'root';
-    const DB_PASS = 'root';
+    static $db_host = '127.0.0.1';
+    static $db_name = 'hstats';
+    static $db_user = 'root';
+    static $db_pass = 'root';
 
-    const ALLOWED_ORIGIN = array(
+    static $allowed_origin = array(
         'http://www.easecloud.cn',
     );
 
-    const EXPIRE_TIME = 24 * 60 *60;
+    static $expire_time  = 24 * 60 * 60;
 
     static $pdo;
 
-    static function pdo($db = Config::DB_NAME)
+    static function pdo($db = false)
     {
         if (!static::$pdo) {
-            $conn = "mysql:host=" . Config::DB_HOST;
+            $conn = "mysql:host=" . Config::$db_host;
+            if ($db === false) $db = Config::$db_name;
             if ($db) $conn .= ";dbname=$db";
-            static::$pdo = new PDO($conn, Config::DB_USER, Config::DB_PASS);
+            static::$pdo = new PDO($conn, Config::$db_user, Config::$db_pass);
         }
 
         return static::$pdo;
