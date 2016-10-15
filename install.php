@@ -4,7 +4,7 @@ require_once 'bootstrap.inc.php';
 
 function install()
 {
-    $dbname = Config::DB_NAME;
+    $dbname = Config::$db_name;
 
     $pdo = Config::pdo('');
 
