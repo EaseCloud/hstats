@@ -24,6 +24,8 @@ $from_url = @$_SERVER['HTTP_REFERER'] ?: http_die('请求无效：没有来源�
 
 function get_visit_count($ip, $url)
 {
+    if(!Config::$expire_time) return increase_count($url);
+
     $pdo = Config::pdo();
 
     $now = time();
@@ -43,7 +45,7 @@ function get_visit_count($ip, $url)
             values ('$ip', '$url', '$now');
         ");
         if (!$result) http_die(implode("\t", $pdo->errorInfo()));
-        increase_count($url);
+        return increase_count($url);
     } elseif (intval($rows[0][0]) + 24 * 60 * 60 < $now) {
         $result = $pdo->exec("
             update hstats_ip_status
@@ -51,17 +53,8 @@ function get_visit_count($ip, $url)
             where ip = '$ip' and url = '$url', 
         ");
         if (!$result) die(implode("\t", $pdo->errorInfo()));
-        increase_count($url);
+        return increase_count($url);
     }
-
-    $result = $pdo->query("
-        select cnt from hstats_visit_count
-        where url = '$url' limit 1;
-    ");
-    if (!$result) http_die(implode("\t", $pdo->errorInfo()));
-
-    $rows = $result->fetchAll();
-    return @intval($rows[0][0]) ?: 0;
 
 }
 
@@ -76,7 +69,7 @@ function increase_count($url)
     if (!$result) http_die(implode("\t", $pdo->errorInfo()));
 
     // 动态清库函数，清理区间之外的记录，
-    if(rand(0, 10000) == 0) {
+    if(Config::$expire_time > 0 && rand(0, 10000) == 0) {
         $time_exipired = time() - Config::$expire_time;
         $result = $pdo->exec("
             delete from hstats_ip_status
@@ -84,6 +77,17 @@ function increase_count($url)
         ");
         if (!$result) http_die(implode("\t", $pdo->errorInfo()));
     }
+
+    // 返回最新的计数值
+    $result = $pdo->query("
+        select cnt from hstats_visit_count
+        where url = '$url' limit 1;
+    ");
+    if (!$result) http_die(implode("\t", $pdo->errorInfo()));
+
+    $rows = $result->fetchAll();
+    return @intval($rows[0][0]) ?: 0;
+
 }
 
 exit(strval(get_visit_count($ip, $from_url)));
