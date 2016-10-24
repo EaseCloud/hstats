@@ -10,7 +10,7 @@ function install()
 
     $sql = "
         CREATE DATABASE  IF NOT EXISTS `$dbname` /*!40100 DEFAULT CHARACTER SET utf8 */;
-        USE `hstats`;
+        USE `$dbname`;
 
         CREATE TABLE IF NOT EXISTS `hstats_ip_status` (
           `ip` varchar(45) NOT NULL,
